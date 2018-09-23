@@ -1,5 +1,5 @@
 {
-    "name": "Sampleplaceholder",
+    "name": "Sampleapp",
     "success_url": "/",
     "scripts": {
       "postdeploy": "flask db upgrade"
@@ -15,7 +15,7 @@
       },
       "MAIL_DEFAULT_SENDER": {
         "description": "Default mail sender address.",
-        "value": "noreply@sampleapp.com.com"
+        "value": "noreply@sampleapp.com"
       }
     },
     "addons": [
