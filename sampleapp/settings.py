@@ -20,6 +20,7 @@ class Config(object):
     SITE_NAME = "Sampleapp"
 
     ADMIN_DASHBOARD_PREFIX = os.environ.get("ADMIN_DASHBOARD_PREFIX", "/__admin")
+    FLASK_ADMIN_SWATCH = "cosmo"
 
     # Flask-Mail configs
     MAIL_SERVER = os.environ.get("MAIL_SERVER", "smtp.sendgrid.net")

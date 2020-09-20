@@ -134,7 +134,6 @@ def register_admin_views(app):
     from .admin import ProtectedAdminIndexView
     from .admin import UserModelView
 
-    app.config["FLASK_ADMIN_SWATCH"] = "cerulean"
     url_prefix = app.config["ADMIN_DASHBOARD_PREFIX"]
     admin = Admin(
         app,

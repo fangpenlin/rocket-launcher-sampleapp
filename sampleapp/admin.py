@@ -1,3 +1,4 @@
+from flask import current_app
 from flask import flash
 from flask import redirect
 from flask import request
@@ -7,6 +8,8 @@ from flask_admin import expose
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.model.template import EndpointLinkRowAction
 from flask_login import login_user
+from flask_principal import Identity
+from flask_principal import identity_changed
 
 from .permissions import admin_permission
 
@@ -24,9 +27,7 @@ class ProtectedAdminIndexView(SecureViewMixin, AdminIndexView):
 
 
 class BaseModelView(SecureViewMixin, ModelView):
-    extra_css = [
-        "/static/vendor/font-awesome/css/fontawesome-all.min.css",
-    ]
+    extra_css = ["/static/vendor/fontawesome-free-5.14.0-web/css/all.min.css"]
 
 
 class UserModelView(BaseModelView):
@@ -72,7 +73,7 @@ class UserModelView(BaseModelView):
     ]
     column_extra_row_actions = [
         EndpointLinkRowAction(
-            "glyphicon icon-user", "admin.user.login_as", id_arg="user_id",
+            "fa fa-sign-in-alt", "admin.user.login_as", id_arg="user_id",
         )
     ]
 
@@ -82,6 +83,9 @@ class UserModelView(BaseModelView):
 
         user = User.query.filter_by(id=user_id).first_or_404()
         login_user(user, remember=False)
+        identity_changed.send(
+            current_app._get_current_object(), identity=Identity(user.id)
+        )
         flash(f"You are logged in as {user.email}.", "success")
         redirect_url = url_for("account.home")
         return redirect(redirect_url)
