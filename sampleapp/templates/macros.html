@@ -76,7 +76,6 @@
 {% macro render_field(form, field, column_class='', kwargs={}, caller=None, show_label=True) %}
   {% set direct_error = h.is_field_error(field.errors) %}
   <div class="form-group {{ column_class }}">
-    {# show label for non-checkbox #}
     {%- if show_label -%}
       {{ render_field_label(field) }}
     {%- endif -%}

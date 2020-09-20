@@ -91,14 +91,18 @@ def register():
 
 @blueprint.route("/forgot-password/", methods=["GET", "POST"])
 def forgot_password():
-    # FIXME:
-    return render_template("public/forgot-password.html")
+    form = ForgotPasswordForm()
+    if form.validate_on_submit():
+        pass
+    return render_template("public/forgot_password.html", form=form)
 
 
 @blueprint.route("/reset-password/", methods=["GET", "POST"])
 def reset_password():
-    # FIXME:
-    return render_template("public/reset-password.html")
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        pass
+    return render_template("public/reset_password.html", form=form)
 
 
 @blueprint.route("/__raise_error__/")

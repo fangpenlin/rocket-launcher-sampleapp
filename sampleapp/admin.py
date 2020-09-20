@@ -87,5 +87,5 @@ class UserModelView(BaseModelView):
             current_app._get_current_object(), identity=Identity(user.id)
         )
         flash(f"You are logged in as {user.email}.", "success")
-        redirect_url = url_for("account.home")
+        redirect_url = url_for("public.home")
         return redirect(redirect_url)
