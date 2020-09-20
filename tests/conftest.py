@@ -7,8 +7,10 @@ from sampleapp.app import create_app
 from sampleapp.extensions import db as _db
 from sampleapp.settings import TestConfig
 
+
 register(factories.UserFactory)
-register(factories.AdminFactory)
+register(factories.UserFactory, "admin_user", is_admin=True)
+register(factories.UserFactory, "inactive_user", active=False)
 
 
 def pytest_sessionstart(session):
@@ -56,3 +58,8 @@ def db(app):
     # Explicitly close DB connection
     _db.session.close()
     _db.drop_all()
+
+
+@pytest.fixture
+def default_password():
+    return factories.USER_DEFAULT_PASSWORD

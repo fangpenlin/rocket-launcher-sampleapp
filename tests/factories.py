@@ -1,10 +1,11 @@
 from factory import post_generation
-from factory import PostGenerationMethodCall
 from factory import Sequence
 from factory.alchemy import SQLAlchemyModelFactory
 
 from sampleapp.extensions import db
 from sampleapp.models.accounts import User
+
+USER_DEFAULT_PASSWORD = "myprecious"
 
 
 class BaseFactory(SQLAlchemyModelFactory):
@@ -28,8 +29,4 @@ class UserFactory(BaseFactory):
     #         we have to use post generation hook here
     @post_generation
     def init_password(obj, create, extracted, **kwargs):
-        obj.set_password(extracted or "myprecious")
-
-
-class AdminFactory(UserFactory):
-    is_admin = True
+        obj.set_password(extracted or USER_DEFAULT_PASSWORD)
