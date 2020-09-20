@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
-"""Public section, including homepage and other public pages."""
+import datetime
 
-from flask import Blueprint
 from flask import abort
+from flask import Blueprint
 from flask import current_app
 from flask import flash
 from flask import redirect
@@ -10,6 +9,17 @@ from flask import render_template
 from flask import request
 from flask import send_from_directory
 from flask import url_for
+from flask_login import login_required
+from flask_login import login_user
+from flask_login import logout_user
+
+from ...extensions import db
+from ...models.accounts import User
+from ...utils import is_safe_url
+from .forms import ForgotPasswordForm
+from .forms import LoginForm
+from .forms import RegisterForm
+from .forms import ResetPasswordForm
 
 blueprint = Blueprint("public", __name__, static_folder="../../static")
 
@@ -24,6 +34,60 @@ def home():
 def terms():
     """TOS page."""
     return render_template("public/terms.html")
+
+
+@blueprint.route("/logout/")
+@login_required
+def logout():
+    """Logout."""
+    logout_user()
+    flash("You are logged out.", "info")
+    return redirect(url_for("public.home"))
+
+
+@blueprint.route("/login/", methods=["GET", "POST"])
+def login():
+    form = LoginForm(request.form)
+    next_url = request.args.get("next")
+    if form.validate_on_submit():
+        remember = request.form.get("remember", "0") == "1"
+        login_user(form.user, remember=remember)
+        if not is_safe_url(next_url):
+            return abort(400)
+        flash("You are logged in.", "success")
+        redirect_url = next_url or url_for("public.home")
+        return redirect(redirect_url)
+    return render_template("public/login.html", form=form, next_url=next_url)
+
+
+@blueprint.route("/register/", methods=["GET", "POST"])
+def register():
+    """Register new user."""
+    form = RegisterForm(request.form)
+    next_url = request.args.get("next")
+    if form.validate_on_submit():
+        user = User(email=form.email.data, password=form.password.data, active=True)
+        db.session.add(user)
+        db.session.commit()
+        login_user(user)
+        if not is_safe_url(next_url):
+            return abort(400)
+        flash("Thank you for registering.", "success")
+        redirect_url = next_url or url_for("public.home")
+        return redirect(redirect_url)
+    return render_template("public/register.html", form=form, next_url=next_url,)
+
+
+@blueprint.route("/forgot-password/", methods=["GET", "POST"])
+def forgot_password():
+    # FIXME:
+    return render_template("public/forgot-password.html")
+
+
+@blueprint.route("/reset-password/", methods=["GET", "POST"])
+def reset_password():
+    # FIXME:
+    return render_template("public/reset-password.html")
 
 
 @blueprint.route("/__raise_error__/")

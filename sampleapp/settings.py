@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 
 from .utils import asbool
@@ -8,6 +7,7 @@ DEFAULT_SECRET_KEY = "DEFAULT_SECRET_KEY"
 
 class Config(object):
     """Base configuration."""
+
     SECRET_KEY = os.environ.get("SECRET_KEY", DEFAULT_SECRET_KEY)
     BCRYPT_LOG_ROUNDS = 13
     DEBUG_TB_ENABLED = False  # Disable Debug toolbar
@@ -17,7 +17,9 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL", "postgresql://localhost/sampleapp"
     )
-    SITE_NAME = 'Sampleapp'
+    SITE_NAME = "Sampleapp"
+
+    ADMIN_DASHBOARD_PREFIX = os.environ.get("ADMIN_DASHBOARD_PREFIX", "/__admin")
 
     # Flask-Mail configs
     MAIL_SERVER = os.environ.get("MAIL_SERVER", "smtp.sendgrid.net")
@@ -36,6 +38,7 @@ class Config(object):
 
 class ProdConfig(Config):
     """Production configuration."""
+
     ENV = "prod"
     DEBUG = False
     DEBUG_TB_ENABLED = False  # Disable Debug toolbar
@@ -43,6 +46,7 @@ class ProdConfig(Config):
 
 class DevConfig(Config):
     """Development configuration."""
+
     ENV = "dev"
     DEBUG = True
     DEBUG_TB_ENABLED = True
@@ -51,13 +55,16 @@ class DevConfig(Config):
 
 class TestConfig(Config):
     """Test configuration."""
+
     TESTING = True
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL", "postgresql://localhost/sampleapp_test"
     )
 
-    BCRYPT_LOG_ROUNDS = 4  # For faster tests; needs at least 4 to avoid "ValueError: Invalid rounds"
+    BCRYPT_LOG_ROUNDS = (
+        4  # For faster tests; needs at least 4 to avoid "ValueError: Invalid rounds"
+    )
     WTF_CSRF_ENABLED = False  # Allows form testing
     # xxx:
     # https://github.com/jarus/flask-testing/issues/21
