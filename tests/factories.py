@@ -21,9 +21,13 @@ class BaseFactory(SQLAlchemyModelFactory):
 class UserFactory(BaseFactory):
     class Meta:
         model = User
+        sqlalchemy_session_persistence = "commit"
 
     email = Sequence(lambda n: "user{0}@example.com".format(n))
-    active = True
+    # Notice: these will be populated by column's default values, but it seems like if we want the pytest-factoryboy
+    #         value overwriting to work, we will need to define them here
+    is_active = True
+    is_admin = False
 
     # Notice: PostGenerationMethodCall is easier to use, but as pytest-factoryboy doesn't support it, so that
     #         we have to use post generation hook here

@@ -66,7 +66,6 @@ class TestLoginForm:
         assert "Invalid email or password" in form.email.errors
 
     def test_validate_inactive_user(self, inactive_user, default_password):
-        # Correct email and password, but user is not activated
         form = LoginForm(email=inactive_user.email, password=default_password)
         assert not form.validate()
         assert "User not activated" in form.email.errors

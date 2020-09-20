@@ -55,9 +55,9 @@ class UserModelView(BaseModelView):
         "plan_slug",
         "feature_slugs",
         "created_at",
-        "active",
         "first_name",
         "last_name",
+        "is_active",
         "is_admin",
     ]
     column_export_exclude_list = [
@@ -68,7 +68,7 @@ class UserModelView(BaseModelView):
         "email",
         "plan_slug",
         "created_at",
-        "active",
+        "is_active",
         "is_admin",
     ]
     column_extra_row_actions = [

@@ -10,7 +10,7 @@ from sampleapp.settings import TestConfig
 
 register(factories.UserFactory)
 register(factories.UserFactory, "admin_user", is_admin=True)
-register(factories.UserFactory, "inactive_user", active=False)
+register(factories.UserFactory, "inactive_user", is_active=False)
 
 
 def pytest_sessionstart(session):

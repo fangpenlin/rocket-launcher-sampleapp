@@ -19,10 +19,8 @@ class User(UserMixin, Model):
     #: The hashed password
     password = Column(db.LargeBinary(128), nullable=True)
     created_at = Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
-    first_name = Column(db.String(30), nullable=True)
-    last_name = Column(db.String(30), nullable=True)
-    active = Column(db.Boolean(), default=False)
-    is_admin = Column(db.Boolean(), default=False)
+    is_active = Column(db.Boolean(), default=True, server_default="f", nullable=False)
+    is_admin = Column(db.Boolean(), default=False, server_default="f", nullable=False)
 
     def __init__(self, email, password=None, **kwargs):
         """Create instance."""

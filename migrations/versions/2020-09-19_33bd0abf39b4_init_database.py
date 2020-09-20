@@ -30,10 +30,8 @@ def upgrade():
         sa.Column("email", sa.String(length=80), nullable=False),
         sa.Column("password", sa.LargeBinary(length=128), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False),
-        sa.Column("first_name", sa.String(length=30), nullable=True),
-        sa.Column("last_name", sa.String(length=30), nullable=True),
-        sa.Column("active", sa.Boolean(), nullable=True),
-        sa.Column("is_admin", sa.Boolean(), nullable=True),
+        sa.Column("is_active", sa.Boolean(), nullable=False, server_default="t"),
+        sa.Column("is_admin", sa.Boolean(), nullable=False, server_default="f"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("email"),
     )
