@@ -2,7 +2,6 @@ from flask import url_for
 
 
 def test_can_log_in_returns_200(testapp, user, default_password):
-    """Login successful."""
     res = testapp.get(url_for("public.login"))
     form = res.form
     form["email"] = user.email
@@ -24,7 +23,6 @@ def test_can_log_with_different_email_case_in_returns_200(
 
 
 def test_sees_alert_on_log_out(testapp, user, default_password):
-    """Show alert on logout."""
     res = testapp.get(url_for("public.login"))
     form = res.form
     form["email"] = user.email
@@ -35,7 +33,6 @@ def test_sees_alert_on_log_out(testapp, user, default_password):
 
 
 def test_sees_error_message_if_password_is_incorrect(testapp, user, default_password):
-    """Show error if password is incorrect."""
     res = testapp.get(url_for("public.login"))
     form = res.form
     form["email"] = user.email
@@ -45,7 +42,6 @@ def test_sees_error_message_if_password_is_incorrect(testapp, user, default_pass
 
 
 def test_sees_error_message_if_username_doesnt_exist(testapp, user, default_password):
-    """Show error if username doesn't exist."""
     res = testapp.get(url_for("public.login"))
     form = res.form
     form["email"] = "unknown@gmail.com"
