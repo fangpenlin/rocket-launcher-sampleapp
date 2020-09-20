@@ -4,6 +4,9 @@ from flask import Flask
 from flask import render_template
 from flask import Response
 from flask_admin import Admin
+from flask_login import current_user
+from flask_principal import identity_loaded
+from flask_principal import UserNeed
 
 from . import commands
 from .blueprints import public
@@ -14,7 +17,9 @@ from .extensions import debug_toolbar
 from .extensions import login_manager
 from .extensions import mail
 from .extensions import migrate
+from .extensions import principal
 from .models.accounts import User
+from .permissions import admin_role_need
 from .settings import DEFAULT_SECRET_KEY
 from .settings import ProdConfig
 
@@ -34,6 +39,7 @@ def create_app(config_object=ProdConfig):
     register_template_filters(app)
     register_admin_views(app)
     register_secret_key_check(app)
+    register_principals_providers(app)
 
     login_manager.login_view = "public.login"
     login_manager.login_message_category = "info"
@@ -50,6 +56,7 @@ def register_extensions(app):
     migrate.init_app(app, db)
     mail.init_app(app)
     login_manager.init_app(app)
+    principal.init_app(app)
     handle_exceptions(app)
     return None
 
@@ -146,6 +153,19 @@ def register_admin_views(app):
             menu_icon_value="user",
         ),
     )
+
+
+def register_principals_providers(app):
+    @identity_loaded.connect_via(app)
+    def on_identity_loaded(sender, identity):
+        # Set the identity user object
+        identity.user = current_user
+
+        if hasattr(current_user, "id"):
+            identity.provides.add(UserNeed(current_user.id))
+
+        if current_user.is_authenticated and current_user.is_admin:
+            identity.provides.add(admin_role_need)
 
 
 @login_manager.user_loader

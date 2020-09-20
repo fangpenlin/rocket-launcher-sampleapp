@@ -6,17 +6,17 @@ from flask_admin import AdminIndexView
 from flask_admin import expose
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.model.template import EndpointLinkRowAction
-from flask_login import current_user
 from flask_login import login_user
+
+from .permissions import admin_permission
 
 
 class SecureViewMixin:
-    pass
-    # def is_accessible(self):
-    #     return current_user.is_active and current_user.is_admin
-    #
-    # def inaccessible_callback(self, name, **kwargs):
-    #     return redirect(url_for("public.login", next=request.url))
+    def is_accessible(self):
+        return admin_permission.can()
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for("public.login", next=request.url))
 
 
 class ProtectedAdminIndexView(SecureViewMixin, AdminIndexView):
