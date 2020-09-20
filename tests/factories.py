@@ -28,7 +28,7 @@ class UserFactory(BaseFactory):
     #         we have to use post generation hook here
     @post_generation
     def init_password(obj, create, extracted, **kwargs):
-        obj.set_password(extracted or "example")
+        obj.set_password(extracted or "myprecious")
 
 
 class AdminFactory(UserFactory):
