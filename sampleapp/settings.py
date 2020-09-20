@@ -60,7 +60,7 @@ class TestConfig(Config):
     TESTING = True
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URL", "postgresql://localhost/sampleapp_test"
+        "DATABASE_URL", "postgresql://fangpen@localhost/sampleapp_test"
     )
 
     BCRYPT_LOG_ROUNDS = (
