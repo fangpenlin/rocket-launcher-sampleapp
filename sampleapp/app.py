@@ -118,12 +118,8 @@ def register_template_filters(app):
     """Register Flask filters."""
     # TODO: add filters here
 
-    # XXX:
     from flask_admin import helpers
-    from flask_admin import babel
 
-    app.jinja_env.globals["_gettext"] = babel.gettext
-    app.jinja_env.globals["_ngettext"] = babel.ngettext
     app.jinja_env.globals["h"] = helpers
 
     return None
