@@ -6,18 +6,14 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import send_from_directory
-from flask import session
 from flask import url_for
 from flask_login import login_required
-from flask_login import login_user
-from flask_login import logout_user
-from flask_principal import AnonymousIdentity
-from flask_principal import Identity
-from flask_principal import identity_changed
 
 from ...extensions import db
 from ...models.accounts import User
 from ...utils import is_safe_url
+from ...utils import login_user
+from ...utils import logout_user
 from .forms import ForgotPasswordForm
 from .forms import LoginForm
 from .forms import RegisterForm
@@ -43,12 +39,6 @@ def terms():
 def logout():
     """Logout."""
     logout_user()
-    # Remove session keys set by Flask-Principal
-    for key in ("identity.name", "identity.auth_type"):
-        session.pop(key, None)
-    identity_changed.send(
-        current_app._get_current_object(), identity=AnonymousIdentity()
-    )
     flash("You are logged out.", "info")
     return redirect(url_for("public.home"))
 
@@ -60,9 +50,6 @@ def login():
     if form.validate_on_submit():
         remember = request.form.get("remember", "0") == "1"
         login_user(form.user, remember=remember)
-        identity_changed.send(
-            current_app._get_current_object(), identity=Identity(form.user.id)
-        )
         if not is_safe_url(next_url):
             return abort(400)
         flash("You are logged in.", "success")
@@ -81,9 +68,6 @@ def register():
         db.session.add(user)
         db.session.commit()
         login_user(user)
-        identity_changed.send(
-            current_app._get_current_object(), identity=Identity(form.user.id)
-        )
         if not is_safe_url(next_url):
             return abort(400)
         flash("Thank you for registering.", "success")
