@@ -23,13 +23,15 @@ email-validator = ">=1.1.1, < 1.2.0"
 
 [dev-packages]
 ipdb = ">=0.13.2, <1.0.0"
-Flask-WebTest = ">=0.0.9, <1.0.0"
+flask-webTest = ">=0.0.9, <1.0.0"
 pytest = ">=5.4.2, <6.0.0"
-WebTest = ">=2.0.35, <3.0.0"
+pytest-cov = ">=2.9.0, <3.0.0"
+pytest-factoryboy = ">=2.0.3, <3.0.0"
+webtest = ">=2.0.35, <3.0.0"
 black = "==20.8b1"
 pylint = ">=2.5.2, <3.0.0"
-pytest-cov = ">=2.9.0, <3.0.0"
 python-dotenv = ">=0.13.0, <1.0.0"
+factory-boy = ">=3.0.1, <4.0.0"
 
 [requires]
 python_version = "3.8"

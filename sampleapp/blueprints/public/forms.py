@@ -29,12 +29,8 @@ class LoginForm(FlaskForm):
             return False
 
         self.user = User.query.filter(User.email.ilike(self.email.data)).first()
-        if not self.user:
-            self.email.errors.append("Unknown email")
-            return False
-
-        if not self.user.check_password(self.password.data):
-            self.password.errors.append("Invalid password")
+        if not self.user or not self.user.check_password(self.password.data):
+            self.email.errors.append("Invalid email or password")
             return False
 
         if not self.user.active:

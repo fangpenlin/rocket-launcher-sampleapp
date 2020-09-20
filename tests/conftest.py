@@ -1,9 +1,14 @@
 import pytest
 from flask_webtest import TestApp
+from pytest_factoryboy import register
 
+from . import factories
 from sampleapp.app import create_app
 from sampleapp.extensions import db as _db
 from sampleapp.settings import TestConfig
+
+register(factories.UserFactory)
+register(factories.AdminFactory)
 
 
 def pytest_sessionstart(session):
@@ -12,9 +17,11 @@ def pytest_sessionstart(session):
     ctx.push()
 
     with _app.app_context():
-        _db.engine.execute('''
+        _db.engine.execute(
+            """
         CREATE EXTENSION IF NOT EXISTS pgcrypto
-        ''')
+        """
+        )
 
     ctx.pop()
 

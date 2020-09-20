@@ -128,7 +128,7 @@
 {% endmacro %}
 
 {% macro render_form(form, extra=None, form_opts=None, action=None) -%}
-  {% call form_tag(action=action) %}
+  {% call form_tag(form=form, action=action) %}
     {{ render_form_fields(form, form_opts=form_opts) }}
     {{ render_form_buttons(extra) }}
   {% endcall %}

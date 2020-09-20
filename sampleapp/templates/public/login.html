@@ -8,7 +8,7 @@ Login
 
 {% block content %}
 <h1>Login</h1>
-{% call lib.form_tag(action=action) %}
+{% call lib.form_tag(form=form, action=action) %}
   {{ lib.render_form_hidden_fields(form) }}
   <div class="form-group row">
     <div class="col-sm-8">
