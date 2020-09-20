@@ -81,6 +81,9 @@ def register():
         db.session.add(user)
         db.session.commit()
         login_user(user)
+        identity_changed.send(
+            current_app._get_current_object(), identity=Identity(form.user.id)
+        )
         if not is_safe_url(next_url):
             return abort(400)
         flash("Thank you for registering.", "success")
