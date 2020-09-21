@@ -1,3 +1,6 @@
+import datetime
+
+import jwt
 from flask import abort
 from flask import Blueprint
 from flask import current_app
@@ -80,7 +83,21 @@ def register():
 def forgot_password():
     form = ForgotPasswordForm()
     if form.validate_on_submit():
-        pass
+        user = User.query.filter_by(email=form.email.data).first()
+        if user is not None:
+            now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+            token = jwt.encode(
+                dict(
+                    user_id=str(user.id),
+                    expires_at=(now + datetime.timedelta(days=1)).timestamp(),
+                ),
+                key=current_app.config["SECRET_KEY"],
+                algorithm="HS256",
+            )
+            reset_link = url_for("public.reset_password", token=token, _external=True,)
+            # TODO: send email
+            # TODO: limit time period of forgot password sending to the same account
+            flash("Please check your mailbox for reset password email.", "success")
     return render_template("public/forgot_password.html", form=form)
 
 
