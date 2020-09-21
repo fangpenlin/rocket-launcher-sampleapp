@@ -76,7 +76,7 @@ def register():
     return render_template("public/register.html", form=form, next_url=next_url,)
 
 
-@blueprint.route("/forgot-password/", methods=["GET", "POST"])
+@blueprint.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
     form = ForgotPasswordForm()
     if form.validate_on_submit():
@@ -84,7 +84,7 @@ def forgot_password():
     return render_template("public/forgot_password.html", form=form)
 
 
-@blueprint.route("/reset-password/", methods=["GET", "POST"])
+@blueprint.route("/reset-password", methods=["GET", "POST"])
 def reset_password():
     form = ResetPasswordForm()
     if form.validate_on_submit():
@@ -92,7 +92,7 @@ def reset_password():
     return render_template("public/reset_password.html", form=form)
 
 
-@blueprint.route("/__raise_error__/")
+@blueprint.route("/__raise_error__")
 def raise_error():
     # for testing bugsnag
     raise RuntimeError("failed")
