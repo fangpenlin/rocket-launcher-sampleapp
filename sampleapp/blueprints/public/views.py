@@ -103,6 +103,7 @@ def forgot_password():
             token = jwt.encode(
                 dict(
                     user_id=str(user.id),
+                    created_at=now.timestamp(),
                     expires_at=(
                         now + datetime.timedelta(seconds=valid_period)
                     ).timestamp(),
@@ -138,22 +139,30 @@ def reset_password():
         expires_at = datetime.datetime.utcfromtimestamp(token["expires_at"]).replace(
             tzinfo=datetime.timezone.utc
         )
+        created_at = datetime.datetime.utcfromtimestamp(token["created_at"]).replace(
+            tzinfo=datetime.timezone.utc
+        )
     except (KeyError, jwt.exceptions.DecodeError):
         flash("Invalid token.", "danger")
         return redirect(url_for("public.home"))
 
+    user = User.query.filter_by(id=user_id).with_for_update().first()
+
     now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
-    if now > expires_at:
+    if now > expires_at or (
+        user.reset_password_at is not None
+        and created_at < user.reset_password_at.replace(tzinfo=datetime.timezone.utc)
+    ):
         flash(
-            "Your reset password link is expired, please submit reset password form again.",
+            "Your reset password link has expired, please submit forgot password form again.",
             "danger",
         )
-        return redirect(url_for("public.home"))
+        return redirect(url_for("public.forgot_password"))
 
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        user = User.query.get(user_id)
         user.set_password(form.password.data)
+        user.reset_password_at = now
         db.session.add(user)
         db.session.commit()
         flash("Your password is reset.", "success")

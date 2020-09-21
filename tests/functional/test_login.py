@@ -117,6 +117,7 @@ def test_reset_password(testapp, user, default_password):
         dict(
             user_id=str(user.id),
             expires_at=(now + datetime.timedelta(seconds=10)).timestamp(),
+            created_at=now.timestamp(),
         ),
         key=testapp.app.config["SECRET_KEY"],
         algorithm="HS256",
@@ -131,11 +132,11 @@ def test_reset_password(testapp, user, default_password):
 
     with freeze_time(now + datetime.timedelta(seconds=11)):
         res = testapp.get(url_for("public.reset_password", token=token)).follow()
-        assert "Your reset password link is expired" in res
+        assert "Your reset password link has expired" in res
 
     # Reset password
     new_password = "new" + default_password
-    with freeze_time(now):
+    with freeze_time(now + datetime.timedelta(seconds=5)):
         res = testapp.get(url_for("public.reset_password", token=token), status=200)
         form = res.form
         form["password"] = new_password
@@ -143,3 +144,8 @@ def test_reset_password(testapp, user, default_password):
         res = form.submit().follow()
         assert "Your password is reset" in res
     assert user.check_password(new_password)
+
+    # See if the link expires after we have reset the password already
+    with freeze_time(now):
+        res = testapp.get(url_for("public.reset_password", token=token)).follow()
+        assert "Your reset password link has expired" in res
