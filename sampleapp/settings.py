@@ -17,7 +17,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL", "postgresql://localhost/sampleapp"
     )
-    SITE_NAME = "Sampleapp"
+    SITE_NAME = 'Sampleapp'
 
     ADMIN_DASHBOARD_PREFIX = os.environ.get("ADMIN_DASHBOARD_PREFIX", "/__admin")
     FLASK_ADMIN_SWATCH = "cosmo"
@@ -64,7 +64,7 @@ class TestConfig(Config):
     TESTING = True
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URL", "postgresql://fangpen@localhost/sampleapp_test"
+        "DATABASE_URL", "postgresql://localhost/sampleapp_test"
     )
 
     # For faster tests; needs at least 4 to avoid "ValueError: Invalid rounds"
