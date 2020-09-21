@@ -87,10 +87,12 @@ def forgot_password():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).with_for_update().first()
         if user is not None:
-            now = datetime.datetime.utcnow()
+            now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
             cooldown_time = current_app.config["FORGOT_PASSWORD_COOLDOWN_TIME_SECONDS"]
             if cooldown_time > 0 and user.sent_reset_password_at is not None:
-                elapsed = now - user.sent_reset_password_at
+                elapsed = now - user.sent_reset_password_at.replace(
+                    tzinfo=datetime.timezone.utc
+                )
                 if elapsed.total_seconds() < cooldown_time:
                     flash(
                         "We just sent a reset password email to you, please try again later",

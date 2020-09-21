@@ -67,7 +67,7 @@ def test_forgot_password(testapp, user):
     with mail.record_messages() as outbox:
         res = form.submit()
         assert len(outbox) == 1
-        match = re.search("reset-password\?token=([0-9a-zA-Z.\-_]+)", outbox[0].body)
+        match = re.search("reset-password\\?token=([0-9a-zA-Z.\\-_]+)", outbox[0].body)
         raw_token = match.group(1)
         token = jwt.decode(
             raw_token, key=testapp.app.config["SECRET_KEY"], algorithms=["HS256"],
