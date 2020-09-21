@@ -104,3 +104,30 @@ def test_forgot_password_cooldown_period(testapp, db, user):
     ), mail.record_messages() as outbox:
         form.submit()
         assert len(outbox) == 1
+
+
+def test_reset_password_invalid_token(testapp, user):
+    res = testapp.get(url_for("public.reset_password", token="foobar")).follow()
+    assert "Invalid token" in res
+
+
+def test_reset_password(testapp, user):
+    now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+    token = jwt.encode(
+        dict(
+            user_id=str(user.id),
+            expires_at=(now + datetime.timedelta(seconds=10)).timestamp(),
+        ),
+        key=testapp.app.config["SECRET_KEY"],
+        algorithm="HS256",
+    )
+
+    with freeze_time(now):
+        testapp.get(url_for("public.reset_password", token=token), status=200)
+
+    with freeze_time(now + datetime.timedelta(seconds=10)):
+        testapp.get(url_for("public.reset_password", token=token), status=200)
+
+    with freeze_time(now + datetime.timedelta(seconds=11)):
+        res = testapp.get(url_for("public.reset_password", token=token)).follow()
+        assert "Your reset password link is expired" in res

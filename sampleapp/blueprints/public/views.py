@@ -129,9 +129,35 @@ def forgot_password():
 
 @blueprint.route("/reset-password", methods=["GET", "POST"])
 def reset_password():
+    try:
+        raw_token = request.args["token"]
+        token = jwt.decode(
+            raw_token, key=current_app.config["SECRET_KEY"], algorithms=["HS256"],
+        )
+        user_id = token["user_id"]
+        expires_at = datetime.datetime.utcfromtimestamp(token["expires_at"]).replace(
+            tzinfo=datetime.timezone.utc
+        )
+    except (KeyError, jwt.exceptions.DecodeError):
+        flash("Invalid token.", "danger")
+        return redirect(url_for("public.home"))
+
+    now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+    if now > expires_at:
+        flash(
+            "Your reset password link is expired, please submit reset password form again.",
+            "danger",
+        )
+        return redirect(url_for("public.home"))
+
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        pass
+        user = User.query.get(user_id)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash("Your password is reset.", "success")
+        return redirect(url_for("public.home"))
     return render_template("public/reset_password.html", form=form)
 
 
