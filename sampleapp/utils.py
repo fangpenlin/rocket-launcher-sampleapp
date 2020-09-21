@@ -37,7 +37,7 @@ def is_safe_url(target):
     return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
 
 
-def login_user(user, remember):
+def login_user(user, remember=True):
     flask_login.login_user(user, remember=remember)
     flask_principal.identity_changed.send(
         current_app._get_current_object(), identity=flask_principal.Identity(user.id)
