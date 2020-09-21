@@ -111,7 +111,7 @@ def test_reset_password_invalid_token(testapp, user):
     assert "Invalid token" in res
 
 
-def test_reset_password(testapp, user):
+def test_reset_password(testapp, user, default_password):
     now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
     token = jwt.encode(
         dict(
@@ -122,6 +122,7 @@ def test_reset_password(testapp, user):
         algorithm="HS256",
     )
 
+    # Ensure reset password link expires
     with freeze_time(now):
         testapp.get(url_for("public.reset_password", token=token), status=200)
 
@@ -131,3 +132,14 @@ def test_reset_password(testapp, user):
     with freeze_time(now + datetime.timedelta(seconds=11)):
         res = testapp.get(url_for("public.reset_password", token=token)).follow()
         assert "Your reset password link is expired" in res
+
+    # Reset password
+    new_password = "new" + default_password
+    with freeze_time(now):
+        res = testapp.get(url_for("public.reset_password", token=token), status=200)
+        form = res.form
+        form["password"] = new_password
+        form["confirm"] = new_password
+        res = form.submit().follow()
+        assert "Your password is reset" in res
+    assert user.check_password(new_password)
