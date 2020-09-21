@@ -11,8 +11,10 @@ from flask import request
 from flask import send_from_directory
 from flask import url_for
 from flask_login import login_required
+from flask_mail import Message
 
 from ...extensions import db
+from ...extensions import mail
 from ...models.accounts import User
 from ...utils import is_safe_url
 from ...utils import login_user
@@ -94,8 +96,15 @@ def forgot_password():
                 key=current_app.config["SECRET_KEY"],
                 algorithm="HS256",
             )
-            reset_link = url_for("public.reset_password", token=token, _external=True,)
-            # TODO: send email
+            reset_link = url_for("public.reset_password", token=token, _external=True)
+            msg = Message(
+                f"{current_app.config['SITE_NAME']} - Reset your password",
+                sender=current_app.config["MAIL_DEFAULT_SENDER"],
+                recipients=[user.email],
+            )
+            msg.body = f"To reset your email, please visit {reset_link}"
+            msg.html = f'To reset your email, please click this <a href="{reset_link}">link</a>'
+            mail.send(msg)
             # TODO: limit time period of forgot password sending to the same account
             flash("Please check your mailbox for reset password email.", "success")
     return render_template("public/forgot_password.html", form=form)
