@@ -31,10 +31,14 @@ class Config(object):
     MAIL_USE_TLS = asbool(os.environ.get("MAIL_USE_TLS", "true"))
     MAIL_DEBUG = asbool(os.environ.get("MAIL_DEBUG", "false"))
 
-    # Flask-Security configs
-    SECURITY_REGISTERABLE = asbool(os.environ.get("SECURITY_REGISTERABLE", "true"))
-    SECURITY_PASSWORD_SALT = os.environ.get("SECURITY_PASSWORD_SALT", SECRET_KEY)
-    SECURITY_EMAIL_SENDER = os.environ.get("SECURITY_EMAIL_SENDER", MAIL_DEFAULT_SENDER)
+    # Cooldown time limit for forgot password email
+    FORGOT_PASSWORD_COOLDOWN_TIME_SECONDS = int(
+        os.environ.get("FORGOT_PASSWORD_COOLDOWN_TIME_SECONDS", 60 * 30)
+    )
+    # How long the reset password link should be valid
+    RESET_PASSWORD_LINK_VALID_SECONDS = int(
+        os.environ.get("RESET_PASSWORD_LINK_VALID_SECONDS", 60 * 30)
+    )
 
 
 class ProdConfig(Config):
@@ -63,10 +67,9 @@ class TestConfig(Config):
         "DATABASE_URL", "postgresql://fangpen@localhost/sampleapp_test"
     )
 
-    BCRYPT_LOG_ROUNDS = (
-        4  # For faster tests; needs at least 4 to avoid "ValueError: Invalid rounds"
-    )
+    # For faster tests; needs at least 4 to avoid "ValueError: Invalid rounds"
+    BCRYPT_LOG_ROUNDS = 4
     WTF_CSRF_ENABLED = False  # Allows form testing
-    # xxx:
     # https://github.com/jarus/flask-testing/issues/21
     PRESERVE_CONTEXT_ON_EXCEPTION = False
+    MAIL_DEFAULT_SENDER = "test@example.com"

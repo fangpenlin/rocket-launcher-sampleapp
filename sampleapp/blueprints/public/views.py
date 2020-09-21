@@ -85,13 +85,25 @@ def register():
 def forgot_password():
     form = ForgotPasswordForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter_by(email=form.email.data).with_for_update().first()
         if user is not None:
-            now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+            now = datetime.datetime.utcnow()
+            cooldown_time = current_app.config["FORGOT_PASSWORD_COOLDOWN_TIME_SECONDS"]
+            if cooldown_time > 0 and user.sent_reset_password_at is not None:
+                elapsed = now - user.sent_reset_password_at
+                if elapsed.total_seconds() < cooldown_time:
+                    flash(
+                        "We just sent a reset password email to you, please try again later",
+                        "danger",
+                    )
+                    return redirect(url_for("public.forgot_password"))
+            valid_period = current_app.config["RESET_PASSWORD_LINK_VALID_SECONDS"]
             token = jwt.encode(
                 dict(
                     user_id=str(user.id),
-                    expires_at=(now + datetime.timedelta(days=1)).timestamp(),
+                    expires_at=(
+                        now + datetime.timedelta(seconds=valid_period)
+                    ).timestamp(),
                 ),
                 key=current_app.config["SECRET_KEY"],
                 algorithm="HS256",
@@ -102,11 +114,14 @@ def forgot_password():
                 sender=current_app.config["MAIL_DEFAULT_SENDER"],
                 recipients=[user.email],
             )
-            msg.body = f"To reset your email, please visit {reset_link}"
-            msg.html = f'To reset your email, please click this <a href="{reset_link}">link</a>'
+            msg.body = f"To reset your password, please visit {reset_link}"
+            # TODO: render email template here
+            msg.html = f'To reset your password, please click this <a href="{reset_link}">link</a>'
             mail.send(msg)
-            # TODO: limit time period of forgot password sending to the same account
+            user.sent_reset_password_at = now
             flash("Please check your mailbox for reset password email.", "success")
+            db.session.add(user)
+            db.session.commit()
     return render_template("public/forgot_password.html", form=form)
 
 

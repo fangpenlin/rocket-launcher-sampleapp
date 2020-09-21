@@ -21,6 +21,8 @@ class User(UserMixin, Model):
     created_at = Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     is_active = Column(db.Boolean(), default=True, server_default="f", nullable=False)
     is_admin = Column(db.Boolean(), default=False, server_default="f", nullable=False)
+    # last time we sent reset password email
+    sent_reset_password_at = Column(db.DateTime, nullable=True)
 
     def __init__(self, email, password=None, **kwargs):
         """Create instance."""

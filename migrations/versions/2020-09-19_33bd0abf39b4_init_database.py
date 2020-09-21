@@ -32,6 +32,7 @@ def upgrade():
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("is_active", sa.Boolean(), nullable=False, server_default="t"),
         sa.Column("is_admin", sa.Boolean(), nullable=False, server_default="f"),
+        sa.Column("sent_reset_password_at", sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("email"),
     )
